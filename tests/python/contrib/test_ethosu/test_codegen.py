@@ -874,6 +874,25 @@ def test_tflite_sigmoid(accel_type):
     )
 
 
+@pytest.mark.parametrize("accel_type", ACCEL_TYPES)
+def test_tflite_subtract_sigmoid(accel_type):
+    np.random.seed(0)
+    ifm_shape = [1, 12, 16, 32]
+
+    @tf.function
+    def subtract_sigmoid_function(lhs, rhs):
+        op = tf.math.subtract(lhs, rhs)
+        op = tf.nn.sigmoid(op)
+        return op
+
+    infra.compare_tvm_with_tflite(
+        subtract_sigmoid_function,
+        [ifm_shape, ifm_shape],
+        accel_type,
+        enable_cascader=is_u55_accel_type(accel_type),
+    )
+
+
 # This codegen test checks both, split and split_v
 @pytest.mark.parametrize("accel_type", ACCEL_TYPES)
 @pytest.mark.parametrize(
