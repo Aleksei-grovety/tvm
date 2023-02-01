@@ -27,8 +27,8 @@
 #include <tvm/ir/adt.h>
 #include <tvm/ir/expr.h>
 #include <tvm/ir/function.h>
+#include <tvm/ir/source_map.h>
 #include <tvm/ir/type.h>
-#include <tvm/parser/source_map.h>
 #include <tvm/runtime/container/array.h>
 #include <tvm/runtime/container/map.h>
 #include <tvm/runtime/container/string.h>
@@ -60,7 +60,7 @@ class IRModuleNode : public Object {
   /*! \brief A map from global type vars to ADT type data. */
   Map<GlobalTypeVar, TypeData> type_definitions;
   /*! \brief The source map for the module. */
-  parser::SourceMap source_map;
+  SourceMap source_map;
   /* \brief Additional attributes storing meta-data about the module. */
   DictAttrs attrs;
   /*!
@@ -328,16 +328,7 @@ class IRModuleNode : public Object {
    */
   TVM_DLL std::unordered_set<String> Imports() const;
 
-  /*!
-   * \brief Returns the TVMScript format
-   * \param indent_spaces Number of spaces used for indentation
-   * \param print_line_numbers Whether to print line numbers
-   * \param num_context_lines Number of context lines to print around the underlined text
-   * \param path_to_underline Object path to be underlined
-   */
-  TVM_DLL std::string Script(int indent_spaces = 4, bool print_line_numbers = false,
-                             int num_context_lines = -1,
-                             Optional<ObjectPath> path_to_underline = NullOpt) const;
+  TVM_OBJECT_ENABLE_SCRIPT_PRINTER();
 
   static constexpr const char* _type_key = "IRModule";
   static constexpr const bool _type_has_method_sequal_reduce = true;
@@ -366,7 +357,7 @@ class IRModule : public ObjectRef {
    */
   TVM_DLL explicit IRModule(Map<GlobalVar, BaseFunc> functions,
                             Map<GlobalTypeVar, TypeData> type_definitions = {},
-                            std::unordered_set<String> import_set = {}, parser::SourceMap map = {},
+                            std::unordered_set<String> import_set = {}, SourceMap map = {},
                             DictAttrs attrs = {});
 
   /*! \brief default constructor */
@@ -445,34 +436,6 @@ class IRModule : public ObjectRef {
   // allow copy on write.
   TVM_DEFINE_OBJECT_REF_COW_METHOD(IRModuleNode);
 };
-
-/*!
- * \brief Pretty print a node for debug purposes.
- *
- * \param node The node to be printed.
- * \return The text reperesentation.
- * \note This function does not show version or meta-data.
- *       Use AsText if you want to store the text.
- * \sa AsText.
- */
-TVM_DLL String PrettyPrint(const ObjectRef& node);
-
-/*!
- * \brief Render the node as a string in the text format.
- *
- * \param node The node to be rendered.
- * \param show_meta_data Whether to print meta data section.
- * \param annotate An optional callback function for attaching
- *        additional comment block to an expr.
- *
- * \note We support a limited set of IR nodes that are part of
- *       relay IR and
- *
- * \sa PrettyPrint.
- * \return The text representation.
- */
-TVM_DLL String AsText(const ObjectRef& node, bool show_meta_data = true,
-                      runtime::TypedPackedFunc<String(ObjectRef)> annotate = nullptr);
 
 namespace attr {
 

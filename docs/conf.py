@@ -511,15 +511,15 @@ within_subsection_order = {
         "use_pass_instrument.py",
         "bring_your_own_datatypes.py",
     ],
-    "micro": [
-        "micro_train.py",
-        "micro_autotune.py",
-        "micro_reference_vm.py",
-        "micro_tflite.py",
-        "micro_ethosu.py",
+    "work_with_microtvm": [
         "micro_tvmc.py",
+        "micro_tflite.py",
         "micro_aot.py",
         "micro_pytorch.py",
+        "micro_train.py",
+        "micro_autotune.py",
+        "micro_ethosu.py",
+        "micro_mlperftiny.py",
     ],
 }
 
@@ -550,6 +550,9 @@ def force_gc(gallery_conf, fname):
     gc.collect()
 
 
+# Skips certain files to avoid dependency issues
+filename_pattern_default = "^(?!.*micro_mlperftiny.py).*$"
+
 sphinx_gallery_conf = {
     "backreferences_dir": "gen_modules/backreferences",
     "doc_module": ("tvm", "numpy"),
@@ -562,7 +565,7 @@ sphinx_gallery_conf = {
     "within_subsection_order": WithinSubsectionOrder,
     "gallery_dirs": gallery_dirs,
     "subsection_order": subsection_order,
-    "filename_pattern": os.environ.get("TVM_TUTORIAL_EXEC_PATTERN", ".py"),
+    "filename_pattern": os.environ.get("TVM_TUTORIAL_EXEC_PATTERN", filename_pattern_default),
     "download_all_examples": False,
     "min_reported_time": 60,
     "expected_failing_examples": [],
